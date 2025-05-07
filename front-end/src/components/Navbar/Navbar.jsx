@@ -1,5 +1,5 @@
 import React, { Profiler, useContext, useState } from 'react'
-import './navbar.css'   
+import './Navbar.css'   
 import { assets } from '../../assets/assets'
 import { StoreContext } from '../../context/StoreContext'
 
