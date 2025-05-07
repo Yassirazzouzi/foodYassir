@@ -1,4 +1,4 @@
-import express from 'express';
+
 import cors from 'cors';
 import connectDB from './config/db.js';  // Changed from named import to default import
 import foodRoutes from './routes/foodRoute.js';
@@ -24,7 +24,11 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'], // Ajoutez tous vos ports frontend
+  origin: [
+    'https://food-yassir-k5z1-4drzqzac9-yassirazzouzis-projects.vercel.app', // Admin panel
+    'https://food-yassir-seven.vercel.app', // Frontend
+    'http://localhost:5173', // Local development
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -60,7 +64,7 @@ app.use((req, res, next) => {
 
 // Add this before your routes
 app.use(cors({
-  origin: ['https://your-frontend-url.vercel.app', 'http://localhost:5173'],
+  origin: ['http://food-yassir-seven.vercel.app', 'http://localhost:5173'],
   credentials: true
 }));
 
