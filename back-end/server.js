@@ -58,6 +58,12 @@ app.use((req, res, next) => {
     next();
 });
 
+// Add this before your routes
+app.use(cors({
+  origin: ['https://your-frontend-url.vercel.app', 'http://localhost:5173'],
+  credentials: true
+}));
+
 // Debug middleware
 app.use((req, res, next) => {
   console.log('Request Headers:', req.headers);
@@ -85,6 +91,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port http://localhost:${port}`);
-});
+// Update your port configuration
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
+
+export default app; // Add this line for Vercel

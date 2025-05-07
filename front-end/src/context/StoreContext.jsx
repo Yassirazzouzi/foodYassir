@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 export const StoreContext = React.createContext(null );
 
 const StoreContextProvider = (props) => {
-const url='http://localhost:4000'
+const url = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 const [food_list, setFoodList] = useState([])
 
 const fetchFoodList = async () => {
@@ -18,14 +18,6 @@ const fetchFoodList = async () => {
         console.error("Error fetching food list:", error);
     }
 }
-
-
-
-
-
-
-
-
 
 useEffect(() => {
     
