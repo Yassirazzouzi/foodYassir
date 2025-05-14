@@ -1,105 +1,54 @@
-
+import express from 'express';
 import cors from 'cors';
-import connectDB from './config/db.js';  // Changed from named import to default import
+import connectDB from './config/db.js';
 import foodRoutes from './routes/foodRoute.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { errorHandler, notFound, rateLimiter } from './middleware/middlware.js';
+import { errorHandler, notFound, rateLimiter, requestLogger } from './middleware/middlware.js';
 import dotenv from 'dotenv';
+import UserRouter from './routes/userRoute.js';
 
-import UserRouter from './routes/userRoute.js'; // Add this import
-// Charger les variables d'environnement
+// Environment variables
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = process.env.PORT || 4000;
 
-// Connect to MongoDB
-connectDB();
-
-// Middleware
+// Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Define allowed origins
+const allowedOrigins = [
+  
+];
+
+// More specific CORS configuration
 app.use(cors({
-  origin: [
-    'https://food-yassir-k5z1-4drzqzac9-yassirazzouzis-projects.vercel.app', // Admin panel
-    'https://food-yassir-seven.vercel.app', // Frontend
-    'http://localhost:5173', // Local development
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: 'http://localhost:4000', // Replace with your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-// Middleware pour les headers additionnels
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
-
-// Appliquer le rate limiter - 100 requêtes par 15 minutes
+// Rate limiter
 app.use(rateLimiter(100, 15 * 60 * 1000));
 
-// Move all static file serving to one place, before routes
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-app.use('/images', express.static(path.join(__dirname, 'public/images')));
-
-// Créer le dossier uploads s'il n'existe pas
-import fs from 'fs';
-const uploadsDir = path.join(__dirname, 'public', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Add this before your routes
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-});
-
-// Add this before your routes
-app.use(cors({
-  origin: ['http://food-yassir-seven.vercel.app', 'http://localhost:5173'],
-  credentials: true
-}));
-
-// Debug middleware
-app.use((req, res, next) => {
-  console.log('Request Headers:', req.headers);
-  console.log('Request Body:', req.body);
-  next();
-});
-
-// API routes
+// Routes
 app.use('/api/foods', foodRoutes);
 app.use('/api/users', UserRouter);
 
-app.get("/", (req, res) => {
-  res.send("API is running...");
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK' });
 });
 
-// Middleware de gestion des erreurs
+// Error handling
+app.use(notFound);
 app.use(errorHandler);
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!',
-    error: err.message
-  });
-});
+// Connect to MongoDB
+connectDB().catch(err => console.error('Failed to connect to MongoDB:', err));
 
-// Update your port configuration
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
-}
-
-export default app; // Add this line for Vercel
+// Export the Express app for Vercel
+export default app;

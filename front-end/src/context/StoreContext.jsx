@@ -1,4 +1,4 @@
-// import { food_list} from "../assets/assets";
+
 
 import React, { useEffect, useState } from "react";
 
@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 export const StoreContext = React.createContext(null );
 
 const StoreContextProvider = (props) => {
-const url = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const url ='http://localhost:4000';
 const [food_list, setFoodList] = useState([])
 
 const fetchFoodList = async () => {

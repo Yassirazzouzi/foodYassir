@@ -1,6 +1,4 @@
 import foodModel from "../models/foodModel.js";
-import fs from "fs";
-import path from "path";
 
 // Ajouter un nouveau plat
 const addFood = async (req, res) => {
@@ -11,11 +9,15 @@ const addFood = async (req, res) => {
     const { name, description, category } = req.body;
     const details = typeof req.body.details === 'string' ? JSON.parse(req.body.details) : req.body.details;
 
+    // For Vercel deployment, you should use a cloud storage service
+    // This is a temporary solution that stores just the filename
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+
     const newFood = new foodModel({
       name,
       description,
       category,
-      imageUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
+      imageUrl,
       details
     });
 
@@ -39,17 +41,17 @@ const addFood = async (req, res) => {
 // Récupérer tous les plats
 const getAllFoods = async (req, res) => {
   try {
-    const foods = await foodModel.find();
+    const foods = await foodModel.find(); // This is the most likely line to cause an error
     res.status(200).json({
       success: true,
       count: foods.length,
       foods
     });
   } catch (error) {
-    console.error("Erreur lors de la récupération des plats:", error);
+    console.error("Error fetching all foods:", error); // This should be logging the specific error
     res.status(500).json({
       success: false,
-      message: "Erreur lors de la récupération des plats",
+      message: "Error fetching all foods",
       error: error.message
     });
   }
@@ -106,15 +108,9 @@ const updateFood = async (req, res) => {
       }
     };
 
-    // Handle image update
+    // Handle image update - for Vercel, just store the path
+    // In a production app, you would use a cloud storage service
     if (req.file) {
-      // Delete old image if exists
-      if (existingFood.imageUrl) {
-        const oldImagePath = path.join(process.cwd(), 'public', existingFood.imageUrl);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
       updateData.imageUrl = `/uploads/${req.file.filename}`;
     }
 
@@ -124,7 +120,7 @@ const updateFood = async (req, res) => {
       updateData,
       { 
         new: true, 
-        runValidators: false // Disable validation
+        runValidators: false
       }
     );
 
@@ -156,12 +152,8 @@ const deleteFood = async (req, res) => {
       });
     }
 
-    if (food.imageUrl && food.imageUrl.startsWith('/uploads/')) {
-      const imagePath = path.join(process.cwd(), 'public', food.imageUrl);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    }
+    // For Vercel, we skip file deletion since we can't access the filesystem
+    // In a production app, you would delete from cloud storage here
 
     await foodModel.findByIdAndDelete(req.params.id);
 
