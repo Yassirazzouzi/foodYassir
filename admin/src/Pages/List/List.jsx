@@ -15,7 +15,7 @@ const List = () => {
   const fetchFoods = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/foods/all');
-      // Check if response.data is an array, if not, check for response.data.foods
+     
       const foodsData = Array.isArray(response.data) ? response.data : response.data.foods || [];
       setFoods(foodsData);
       setLoading(false);
@@ -36,11 +36,14 @@ const List = () => {
       }
     }
   };
-
-  // Add a check before mapping
+  
   const renderProducts = () => {
     if (!Array.isArray(foods) || foods.length === 0) {
-      return <div className="no-products">Aucun produit trouvé</div>;
+      return <div className="no-products">
+        <i className="fas fa-utensils" style={{ fontSize: '3rem', color: '#ddd', marginBottom: '1rem' }}></i>
+        <p>Aucun produit trouvé</p>
+        <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>Ajoutez votre premier produit en cliquant sur le bouton ci-dessus</p>
+      </div>;
     }
 
     return foods.map((food) => (
@@ -51,44 +54,52 @@ const List = () => {
           className="product-image"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = 'placeholder-image-url';
+            e.target.src = 'https://via.placeholder.com/300x200?text=Image+non+disponible';
           }}
         />
         <div className="product-info">
           <h3>{food.name}</h3>
           <p className="category">{food.category}</p>
           <p className="description">
-            {food.description ? food.description.substring(0, 100) + '...' : 'Pas de description'}
+            {food.description ? (food.description.length > 100 ? food.description.substring(0, 100) + '...' : food.description) : 'Pas de description'}
           </p>
           <div className="product-details">
-            <span>Calories: {food.details?.calories || 'N/A'}</span>
-            <span>Temps: {food.details?.time || 'N/A'}</span>
+            <span><i className="fas fa-fire" style={{ color: '#ff6b6b' }}></i> Calories: {food.details?.calories || 'N/A'}</span>
+            <span><i className="fas fa-clock" style={{ color: '#4dabf7' }}></i> Temps: {food.details?.time || 'N/A'}</span>
+            <span><i className="fas fa-euro-sign" style={{ color: '#40c057' }}></i> Prix: {food.price ? `${food.price} €` : 'N/A'}</span>
           </div>
         </div>
         <div className="product-actions">
           <Link to={`/edit/${food._id}`} className="edit-button">
-            Modifier
+            <i className="fas fa-edit"></i> Modifier
           </Link>
           <button 
             onClick={() => handleDelete(food._id)} 
             className="delete-button"
           >
-            Supprimer
+            <i className="fas fa-trash-alt"></i> Supprimer
           </button>
         </div>
       </div>
     ));
   };
 
-  if (loading) return <div className="loading">Chargement...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) return <div className="loading">
+    <div className="spinner" style={{ marginBottom: '1rem' }}></div>
+    Chargement des produits...
+  </div>;
+  
+  if (error) return <div className="error">
+    <i className="fas fa-exclamation-circle" style={{ fontSize: '2rem', marginBottom: '1rem' }}></i>
+    <p>{error}</p>
+  </div>;
 
   return (
     <div className="list-container">
       <div className="list-header">
         <h2>Liste des Produits</h2>
         <Link to="/add" className="add-button">
-          Ajouter un produit
+          <i className="fas fa-plus"></i> Ajouter un produit
         </Link>
       </div>
 

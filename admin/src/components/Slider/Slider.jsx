@@ -48,6 +48,7 @@ const Slider = () => {
             <div className="option-icon">
               <img src={assets.order_icon} alt="Categories" />
             </div>
+             
             <p>Catégories</p>
           </NavLink>
           

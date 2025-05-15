@@ -1,7 +1,8 @@
-import React, { Profiler, useContext, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import './Navbar.css'   
 import { assets } from '../../assets/assets'
 import { StoreContext } from '../../context/StoreContext'
+import { Link } from 'react-router-dom'
 
 const Navbar = ({setshowLogin}) => {
     const [menu, setMenu] = useState('menu')
@@ -18,18 +19,20 @@ const Navbar = ({setshowLogin}) => {
     return (
         <nav className="navbar">
             <div className="navbar-container">
-                <img src={assets.logo} alt="Logo" className="logo"/>
+                <Link to="/">
+                    <img src={assets.logo} alt="Logo" className="logo"/>
+                </Link>
                 
                 <div className={`navbar-menu-container ${showMobileMenu ? 'active' : ''}`}>
                     <ul className="navbar-menu">
                         <li onClick={()=>setMenu("home")} className={menu==='home'?'active':''}>
-                            <a href="#">Accueil</a>
+                            <Link to="/">Accueil</Link>
                         </li>
                         <li onClick={()=>setMenu("menu")} className={menu==='menu'?'active':''}>
-                            <a href="#">Menu</a>
+                            <Link to="/menu">Menu</Link>
                         </li>
                         <li onClick={()=>setMenu("contact-us")} className={menu==='contact-us'?'active':''}>
-                            <a href="#">Contact</a>
+                            <Link to="/contact">Contact</Link>
                         </li>
                     </ul>
                 </div>
@@ -40,15 +43,12 @@ const Navbar = ({setshowLogin}) => {
                         <input type="text" placeholder="Rechercher..." />
                     </div>
                     
-
                     {!token?<button className="signup-btn" onClick={()=>setshowLogin(true)} >Sign up</button> : <div className="navbar-profile">
                         <img src={assets.profile_icon} alt='Profile'/>
                         <ul className='nav-profile-menu'>
                             <li onClick={logout}><img src={assets.logout_icon} alt="" />Logout</li>
                         </ul>
                     </div>   }
-
-
 
                     <div className="mobile-menu-toggle" onClick={toggleMobileMenu}>
                         <div className={`hamburger ${showMobileMenu ? 'active' : ''}`}>

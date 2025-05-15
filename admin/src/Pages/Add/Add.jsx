@@ -7,13 +7,13 @@ const Add = () => {
   const [activeTab, setActiveTab] = useState('basic');
   
   const [formData, setFormData] = useState({
-    // Informations de base
+  
     name: '',
     description: '',
     category: 'Salade',
     image: null,
     
-    // Détails nutritionnels
+    
     ingredients: [],
     preparation: '',
     calories: '',
@@ -38,14 +38,14 @@ const Add = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     
-    // Check file size (max 5MB)
+    
     if (file && file.size > 10 * 1024 * 1024) {
       alert("L'image ne doit pas dépasser 5MB");
       e.target.value = '';
       return;
     }
   
-    // Check file type
+  
     if (file && !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
       alert("Format d'image non supporté. Utilisez JPG, PNG ou WEBP.");
       e.target.value = '';
@@ -128,7 +128,7 @@ const Add = () => {
     return errors;
   };
 
-  // Modify handleSubmit to use validation
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -143,7 +143,7 @@ const Add = () => {
     try {
       const formDataToSend = new FormData();
       
-      // Informations de base
+ 
       formDataToSend.append('name', formData.name.trim());
       formDataToSend.append('description', formData.description.trim());
       formDataToSend.append('category', formData.category);
@@ -152,7 +152,7 @@ const Add = () => {
         formDataToSend.append('image', formData.image);
       }
       
-      // Structure les détails selon le modèle MongoDB
+
       const detailsData = {
         ingredients: formData.ingredients,
         preparation: formData.preparation,
@@ -162,7 +162,7 @@ const Add = () => {
         benefits: formData.benefits
       };
       
-      // Ajoute les détails comme string JSON
+
       formDataToSend.append('details', JSON.stringify(detailsData));
       
       console.log('Données envoyées:', Object.fromEntries(formDataToSend));

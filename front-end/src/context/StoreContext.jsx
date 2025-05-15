@@ -1,50 +1,43 @@
-// import { food_list} from "../assets/assets";
+import React, { createContext, useEffect, useState } from 'react';
+import axios from 'axios';
 
-import React, { useEffect, useState } from "react";
-
-
-export const StoreContext = React.createContext(null );
+export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
-const url = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-const [food_list, setFoodList] = useState([])
+  const [food_list, setFoodList] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const url = "http://localhost:4000"; 
 
-const fetchFoodList = async () => {
+  const fetchFoods = async () => {
     try {
-        const response = await fetch(url+"/api/foods/all");
-        const data = await response.json();
-        setFoodList(data.foods);
+      const response = await axios.get(`${url}/api/foods/all`);
+      if (response.data.success) {
+        setFoodList(response.data.foods);
+        console.log("Produits chargés avec succès:", response.data.foods);
+      }
     } catch (error) {
-        console.error("Error fetching food list:", error);
+      console.error("Erreur lors du chargement des produits:", error);
     }
-}
+  };
 
-useEffect(() => {
-    
-    
-    async function loadData() 
-    {
-        await fetchFoodList()
-        if (localStorage.getItem('token')) {
-            setToken(localStorage.getItem('token'));
-        }
-    }
-    loadData()
-}, []);
+  useEffect(() => {
+    fetchFoods();
+  }, []);
 
-const [token, setToken]= useState('')
-    const contextValue={
-                food_list,
-                url,
-                token,
-                setToken
-    }
-    return (
-        <StoreContext.Provider value={contextValue}>
-            {props.children}
-        </StoreContext.Provider>
-    )
+  const contextValue = {
+    food_list,
+    setFoodList,
+    url,
+    fetchFoods,
+    token,
+    setToken
+  };
 
-}
+  return (
+    <StoreContext.Provider value={contextValue}>
+      {props.children}
+    </StoreContext.Provider>
+  );
+};
 
 export default StoreContextProvider;

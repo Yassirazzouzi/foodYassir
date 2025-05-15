@@ -7,7 +7,7 @@ import { Routes, Route } from 'react-router-dom'
 import Footer from './components/Footer/Footer'
 import Login from './components/Login/login'
 import DetailPopup from './components/DetailCart/DetailPopup'
-
+import Contact from './components/Contact/Contact'
 const App = () => {
   const [showLogin, setshowLogin] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
@@ -35,6 +35,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home openDetail={openDetail} />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/order" element={<PlaceOrder />} />
         </Routes>
       </div>
